@@ -26,3 +26,5 @@ Some browser pages such as `brave://flags` are restricted, so the extension may 
 To back up your full library, open **Import / export** and select **Export all groups**. This creates one `bookmark-groups-backup.json` file containing every group and bookmark. Select **Import backup** and choose that file to restore all groups. Existing groups are kept; if a restored group name already exists, the imported group gets a number suffix so neither copy is overwritten. Earlier single-group export files can also be imported.
 
 Use the sun/moon button in the header to switch between light and dark mode. Your choice is saved; before you choose, the popup follows your system theme.
+
+Use the pencil button beside a bookmark to change its saved name. Enter a nickname and select **Save**, or use **Cancel** / Escape to keep its current name. Nicknames appear in search results and backups; the website URL stays the same.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bookmark Organizer",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Save bookmarks into groups and find them with search.",
   "permissions": ["storage", "activeTab", "tabs"],
   "background": {

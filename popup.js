@@ -154,6 +154,81 @@ function renderBookmarks() {
     link.append(favicon, copy);
     const actions = document.createElement("div");
     actions.className = "bookmark-actions";
+    const rename = document.createElement("button");
+    rename.className = "rename-bookmark";
+    rename.type = "button";
+    rename.title = "Rename bookmark";
+    rename.setAttribute("aria-label", `Rename ${bookmark.title || bookmark.url}`);
+    rename.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m14 5 5 5M4 20l5-1L20 8a2 2 0 0 0-5-5L4 14l-1 7Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    rename.addEventListener("click", () => {
+      const form = document.createElement("form");
+      form.className = "rename-form";
+      const label = document.createElement("label");
+      label.textContent = "Bookmark nickname";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = bookmark.title || bookmark.url;
+      input.required = true;
+      input.maxLength = 200;
+      label.append(input);
+      const save = document.createElement("button");
+      save.type = "submit";
+      save.className = "primary-button";
+      save.textContent = "Save";
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "text-button";
+      cancel.textContent = "Cancel";
+      const close = () => {
+        if (save.disabled) return;
+        form.remove();
+        link.classList.remove("hidden");
+        actions.classList.remove("hidden");
+        rename.focus();
+      };
+      cancel.addEventListener("click", close);
+      input.addEventListener("input", () => input.setCustomValidity(""));
+      form.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); close(); }
+      });
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const name = input.value.trim();
+        if (!name) {
+          input.setCustomValidity("Enter a bookmark nickname.");
+          input.reportValidity();
+          return;
+        }
+        const stored = groups.find((group) => group.id === bookmark.groupId)?.bookmarks.find((item) => item.url === bookmark.url);
+        if (!stored) return;
+        const previous = stored.title;
+        stored.title = name;
+        save.disabled = cancel.disabled = input.disabled = true;
+        try {
+          await api.storage.local.set({ groups });
+          bookmark.title = name;
+          title.textContent = name;
+          rename.setAttribute("aria-label", `Rename ${name}`);
+          move.setAttribute("aria-label", `Move ${name} to another group`);
+          destination.setAttribute("aria-label", `Choose a group for ${name}`);
+          remove.setAttribute("aria-label", `Remove ${name}`);
+          save.disabled = false;
+          close();
+          message("Bookmark renamed.");
+        } catch {
+          stored.title = previous;
+          save.disabled = cancel.disabled = input.disabled = false;
+          message("Could not rename the bookmark. Please try again.");
+          input.focus();
+        }
+      });
+      form.append(label, save, cancel);
+      link.classList.add("hidden");
+      actions.classList.add("hidden");
+      row.append(form);
+      input.focus();
+      input.select();
+    });
     const move = document.createElement("button");
     move.className = "move-bookmark";
     move.type = "button";
@@ -196,7 +271,7 @@ function renderBookmarks() {
     remove.title = "Remove bookmark";
     remove.innerHTML = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7m3.5 0-.8 12h-10L6.5 7m4 3v5m3-5v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     remove.addEventListener("click", () => removeBookmark(bookmark.groupId, bookmark.url, remove));
-    actions.append(move, destination, remove);
+    actions.append(rename, move, destination, remove);
     row.append(link, actions);
     elements.list.append(row);
   }

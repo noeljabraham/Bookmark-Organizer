@@ -100,10 +100,14 @@ input::placeholder { color: #99a8a2; }
 .bookmark:hover { border-color: #c9e0d4; background: #fbfefc; box-shadow: 0 3px 9px #173a350a; transform: translateY(-1px); }
 .bookmark-open { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 3px 0; color: inherit; text-decoration: none; }
 .bookmark-actions { display: flex; align-items: center; gap: 1px; flex: none; }
-.move-bookmark, .remove-bookmark { width: 32px; height: 32px; flex: none; display: grid; place-items: center; padding: 0; border: 1px solid transparent; border-radius: 9px; color: #84948e; background: transparent; transition: color 150ms ease, background 150ms ease, border-color 150ms ease; }
+.rename-bookmark, .move-bookmark, .remove-bookmark { width: 32px; height: 32px; flex: none; display: grid; place-items: center; padding: 0; border: 1px solid transparent; border-radius: 9px; color: #84948e; background: transparent; transition: color 150ms ease, background 150ms ease, border-color 150ms ease; }
+.rename-bookmark:hover { border-color: #cce5d8; color: #28755f; background: #eff8f2; }
+.rename-form { display: flex; flex-wrap: wrap; align-items: end; gap: 6px; width: 100%; padding: 4px 0; }
+.rename-form label { display: grid; gap: 5px; width: 100%; color: var(--muted); font-size: 11px; }
+.rename-form input { width: 100%; padding: 9px; font-size: 12px; }
 .move-bookmark:hover { border-color: #cce5d8; color: #28755f; background: #eff8f2; }
 .move-bookmark:disabled { cursor: not-allowed; opacity: .45; }
-.move-bookmark svg, .remove-bookmark svg { width: 17px; height: 17px; }
+.rename-bookmark svg, .move-bookmark svg, .remove-bookmark svg { width: 17px; height: 17px; }
 .move-group { width: 118px; height: 32px; padding: 0 4px; border-radius: 8px; font-size: 10px; }
 .remove-bookmark:hover { border-color: #f1d6d1; color: #b44738; background: #fff3f0; }
 .remove-bookmark:disabled { cursor: wait; opacity: .55; }
@@ -178,7 +182,8 @@ footer { padding-top: 5px; color: #8b9b95; text-align: center; font-size: 10px; 
 :root[data-theme="dark"] .bookmark-url { color: #b1c0b9; }
 :root[data-theme="dark"] .favicon { border-color: #3b5146; color: #bfdbcd; background: #26372f; }
 :root[data-theme="dark"] .empty-state { border-color: #405349; color: #bdcbc4; background: #18241e; }
-:root[data-theme="dark"] .move-bookmark { color: #a9c7b8; }
+:root[data-theme="dark"] .rename-bookmark, :root[data-theme="dark"] .move-bookmark { color: #a9c7b8; }
+:root[data-theme="dark"] .rename-bookmark:hover { border-color: #456f5b; color: #b9ead4; background: #24392d; }
 :root[data-theme="dark"] .move-bookmark:hover { border-color: #456f5b; color: #b9ead4; background: #24392d; }
 :root[data-theme="dark"] .remove-bookmark { color: #b1c0b9; }
 :root[data-theme="dark"] .remove-bookmark:hover { border-color: #754943; color: #ffaaa0; background: #422c29; }
