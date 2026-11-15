@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bookmark Groups</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 4.75A1.75 1.75 0 0 1 7.75 3h8.5A1.75 1.75 0 0 1 18 4.75V21l-6-3.7L6 21V4.75Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="brand-copy"><strong>Bookmark Groups</strong><span>Your saved corners of the web</span></div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <button id="toggle-group-form" class="text-button hidden" type="button">+ New group</button>
+      </header>
+
+      <section id="first-group" class="first-group" aria-labelledby="welcome-title">
+        <div class="welcome-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v15l-7-4-7 4v-15Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </div>
+        <h1 id="welcome-title">Make room for what you find.</h1>
+        <p>Create your first group, then save any page in one click.</p>
+      </section>
+
+      <form id="group-form" class="group-form">
+        <label for="group-name">Group name</label>
+        <div class="form-row">
+          <input id="group-name" name="group-name" maxlength="40" placeholder="e.g. Read later" required autocomplete="off">
+          <button class="primary-button" type="submit">Create group</button>
+        </div>
+      </form>
+
+      <section id="save-section" class="save-section hidden" aria-labelledby="save-title">
+        <div class="section-heading">
+          <div><h2 id="save-title">Save this page</h2><p id="active-page" class="active-page">Loading current page…</p></div>
+        </div>
+        <form id="save-form" class="save-row">
+          <label class="sr-only" for="save-group">Choose a group</label>
+          <select id="save-group" aria-label="Choose a group"></select>
+          <button class="primary-button" type="submit">Save page</button>
+        </form>
+      </section>
+
+      <section id="library-section" class="library-section hidden" aria-labelledby="library-title">
+        <div class="section-heading library-heading">
+          <div class="library-summary">
+            <h2 id="library-title">Your library</h2>
+            <div class="library-meta">
+              <p id="bookmark-count">0 saved pages</p>
+              <button id="all-groups-filter" class="filter-button" type="button" aria-pressed="true">All groups</button>
+            </div>
+          </div>
+          <div class="library-tools">
+            <button id="backup-toggle" class="backup-toggle" type="button" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Import / export
+            </button>
+            <button id="search-toggle" class="search-toggle" type="button" aria-label="Search bookmarks" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="search-panel" class="search-panel hidden">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input id="search" class="search-input" type="search" placeholder="Search bookmarks…" aria-label="Search bookmarks" autocomplete="off">
+          <button id="search-reset" class="search-reset" type="button" aria-label="Clear search" title="Clear search" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <section id="backup-panel" class="backup-panel hidden" aria-label="Import or export all groups">
+          <div class="backup-row">
+            <button id="export-all" class="backup-action" type="button">Export all groups</button>
+            <button id="import-group" class="backup-action import-action" type="button">Import backup</button>
+            <input id="import-file" class="hidden" type="file" accept="application/json,.json">
+          </div>
+          <p>One JSON file contains all groups and their bookmarks.</p>
+        </section>
+        <div id="group-filters" class="group-filters" role="group" aria-label="Filter bookmarks by group"></div>
+        <div id="bookmark-list" class="bookmark-list" aria-live="polite"></div>
+      </section>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <footer>Saved on this device</footer>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
