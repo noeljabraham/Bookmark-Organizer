@@ -1,4 +1,4 @@
-# Bookmark Groups
+# Bookmark Organizer — Save by Group
 
 A small local Chrome and Firefox extension for saving pages into named groups and searching bookmarks.
 
