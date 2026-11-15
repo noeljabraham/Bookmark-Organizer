@@ -1,11 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Bookmark Groups",
+  "name": "Bookmark Organizer",
   "version": "1.0.0",
   "description": "Save bookmarks into groups and find them with search.",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "tabs"],
+  "background": {
+    "scripts": ["background.js"],
+    "service_worker": "background.js"
+  },
   "action": {
-    "default_title": "Bookmark Groups",
+    "default_title": "Bookmark Organizer",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
@@ -23,7 +27,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "bookmark-groups@local.extension",
-      "strict_min_version": "109.0"
+      "strict_min_version": "121.0"
     }
   }
 }

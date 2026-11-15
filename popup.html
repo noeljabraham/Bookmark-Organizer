@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bookmark Groups</title>
+    <title>Bookmark Organizer</title>
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
@@ -12,7 +12,7 @@
         <div class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none"><path d="M6 4.75A1.75 1.75 0 0 1 7.75 3h8.5A1.75 1.75 0 0 1 18 4.75V21l-6-3.7L6 21V4.75Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
         </div>
-        <div class="brand-copy"><strong>Bookmark Groups</strong><span>Your saved corners of the web</span></div>
+        <div class="brand-copy"><strong>Bookmark Organizer</strong><span>Your saved corners of the web</span></div>
         <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">
           <svg class="moon-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <svg class="sun-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -44,6 +44,14 @@
           <label class="sr-only" for="save-group">Choose a group</label>
           <select id="save-group" aria-label="Choose a group"></select>
           <button class="primary-button" type="submit">Save page</button>
+        </form>
+        <button id="manual-toggle" class="manual-toggle hidden" type="button">Can’t read this page? Paste its URL</button>
+        <form id="manual-save-form" class="manual-save-form hidden">
+          <label class="sr-only" for="manual-url">Page URL</label>
+          <input id="manual-url" type="text" placeholder="Paste page URL, including brave://" autocomplete="off" required>
+          <label class="sr-only" for="manual-title">Page title</label>
+          <input id="manual-title" type="text" placeholder="Title (optional)" autocomplete="off">
+          <button class="primary-button" type="submit">Save link</button>
         </form>
       </section>
 

@@ -5,6 +5,8 @@ const elements = {
   toggleForm: $("#toggle-group-form"), saveSection: $("#save-section"), saveForm: $("#save-form"),
   saveGroup: $("#save-group"), activePage: $("#active-page"), library: $("#library-section"),
   themeToggle: $("#theme-toggle"),
+  manualToggle: $("#manual-toggle"), manualForm: $("#manual-save-form"), manualUrl: $("#manual-url"),
+  manualTitle: $("#manual-title"),
   filters: $("#group-filters"), allGroupsFilter: $("#all-groups-filter"), list: $("#bookmark-list"), search: $("#search"), searchToggle: $("#search-toggle"),
   searchPanel: $("#search-panel"), searchReset: $("#search-reset"),
   count: $("#bookmark-count"), status: $("#status"), backupToggle: $("#backup-toggle"),
@@ -28,6 +30,11 @@ function message(text) {
   elements.status.textContent = text;
   clearTimeout(message.timer);
   message.timer = setTimeout(() => { elements.status.textContent = ""; }, 2400);
+}
+
+function isSupportedBookmarkUrl(value) {
+  try { return ["http:", "https:", "brave:", "chrome:", "edge:", "about:"].includes(new URL(value).protocol); }
+  catch { return false; }
 }
 
 function render() {
@@ -89,7 +96,7 @@ function renderBookmarks() {
     .filter((group) => selectedGroup === "all" || group.id === selectedGroup)
     .flatMap((group) => group.bookmarks.map((bookmark) => ({ ...bookmark, group: group.name, groupId: group.id })))
     .filter((bookmark) => {
-      try { return ["http:", "https:"].includes(new URL(bookmark.url).protocol) && `${bookmark.title} ${bookmark.url} ${bookmark.group}`.toLocaleLowerCase().includes(query); }
+      try { return isSupportedBookmarkUrl(bookmark.url) && `${bookmark.title} ${bookmark.url} ${bookmark.group}`.toLocaleLowerCase().includes(query); }
       catch { return false; }
     })
     .sort((a, b) => b.savedAt - a.savedAt);
@@ -104,23 +111,37 @@ function renderBookmarks() {
   for (const bookmark of matches) {
     const row = document.createElement("div");
     row.className = "bookmark";
+    const canOpen = ["http:", "https:"].includes(new URL(bookmark.url).protocol);
     const link = document.createElement("a");
     link.className = "bookmark-open";
     link.href = bookmark.url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
+    if (canOpen) {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    } else {
+      link.addEventListener("click", async (event) => {
+        event.preventDefault();
+        try {
+          await api.tabs.create({ url: bookmark.url });
+        } catch {
+          message("Your browser blocks opening this internal page from extensions. Copy its URL into the address bar.");
+        }
+      });
+    }
     const favicon = document.createElement("span");
     favicon.className = "favicon";
     favicon.setAttribute("aria-hidden", "true");
     const fallback = document.createElement("span");
     try { fallback.textContent = new URL(bookmark.url).hostname.replace(/^www\./, "").charAt(0).toUpperCase() || "↗"; }
     catch { fallback.textContent = "↗"; }
-    const icon = document.createElement("img");
-    icon.src = bookmark.faviconUrl || `${new URL(bookmark.url).origin}/favicon.ico`;
-    icon.alt = "";
-    icon.referrerPolicy = "no-referrer";
-    icon.addEventListener("error", () => icon.remove(), { once: true });
-    favicon.append(fallback, icon);
+    if (canOpen) {
+      const icon = document.createElement("img");
+      icon.src = bookmark.faviconUrl || `${new URL(bookmark.url).origin}/favicon.ico`;
+      icon.alt = "";
+      icon.referrerPolicy = "no-referrer";
+      icon.addEventListener("error", () => icon.remove(), { once: true });
+      favicon.append(fallback, icon);
+    } else favicon.append(fallback);
     const copy = document.createElement("span");
     copy.className = "bookmark-copy";
     const title = document.createElement("span");
@@ -224,10 +245,14 @@ async function loadActiveTab() {
     [activeTab] = await api.tabs.query({ active: true, currentWindow: true });
     elements.activePage.textContent = activeTab?.title || activeTab?.url || "Current page";
     elements.saveForm.querySelector("button").disabled = !activeTab?.url;
-    if (!activeTab?.url) elements.activePage.textContent = "This page can’t be saved.";
+    if (!activeTab?.url) {
+      elements.activePage.textContent = "This browser page can’t be read by the extension.";
+      elements.manualToggle.classList.remove("hidden");
+    }
   } catch {
-    elements.activePage.textContent = "Could not read the current page.";
+    elements.activePage.textContent = "This browser page can’t be read by the extension.";
     elements.saveForm.querySelector("button").disabled = true;
+    elements.manualToggle.classList.remove("hidden");
   }
 }
 
@@ -279,6 +304,39 @@ elements.saveForm.addEventListener("submit", async (event) => {
   } catch {
     group.bookmarks.shift();
     message("Could not save this page. Please try again.");
+  }
+});
+
+elements.manualToggle.addEventListener("click", () => {
+  elements.manualForm.classList.toggle("hidden");
+  if (!elements.manualForm.classList.contains("hidden")) elements.manualUrl.focus();
+});
+
+elements.manualForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const url = elements.manualUrl.value.trim();
+  if (!isSupportedBookmarkUrl(url)) {
+    message("Enter an http(s), brave://, chrome://, edge://, or about: URL.");
+    return;
+  }
+  const group = groups.find((item) => item.id === elements.saveGroup.value);
+  if (!group) return;
+  if (group.bookmarks.some((bookmark) => bookmark.url === url)) {
+    message("This page is already in that group.");
+    return;
+  }
+  const bookmark = { url, title: elements.manualTitle.value.trim() || url, savedAt: Date.now() };
+  group.bookmarks.unshift(bookmark);
+  try {
+    await api.storage.local.set({ groups });
+    elements.manualUrl.value = "";
+    elements.manualTitle.value = "";
+    elements.manualForm.classList.add("hidden");
+    render();
+    message(`Saved to “${group.name}”.`);
+  } catch {
+    group.bookmarks.shift();
+    message("Could not save this link. Please try again.");
   }
 });
 
@@ -343,7 +401,7 @@ elements.importFile.addEventListener("change", async () => {
       : data?.format === "bookmark-groups" && data.group ? [data.group] : null;
     const validGroup = (group) => typeof group?.name === "string" && group.name.trim() && group.name.length <= 40 &&
       Array.isArray(group.bookmarks) && group.bookmarks.every((bookmark) => bookmark && typeof bookmark.title === "string" &&
-        validUrl(bookmark.url) && Number.isFinite(bookmark.savedAt) &&
+        isSupportedBookmarkUrl(bookmark.url) && Number.isFinite(bookmark.savedAt) &&
         (bookmark.faviconUrl === undefined || validUrl(bookmark.faviconUrl)));
     if (data?.formatVersion !== 1 || !Array.isArray(importedGroups) || importedGroups.length > 1000 ||
         importedGroups.some((group) => !validGroup(group)) ||
@@ -377,7 +435,7 @@ elements.importFile.addEventListener("change", async () => {
     render();
     message(`Imported ${restoredGroups.length} ${restoredGroups.length === 1 ? "group" : "groups"}.`);
   } catch {
-    message("Could not import this file. Choose a valid Bookmark Groups export.");
+    message("Could not import this file. Choose a valid Bookmark Organizer export.");
   }
 });
 document.addEventListener("keydown", (event) => {
