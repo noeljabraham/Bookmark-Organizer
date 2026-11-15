@@ -1,6 +1,19 @@
 # Bookmark Organizer — Save by Group
 
-A small local Chrome and Firefox extension for saving pages into named groups and searching bookmarks.
+A lightweight Chrome, Brave, and Firefox extension for saving pages into named groups and searching bookmarks.
+
+## Features
+
+- **Organize by group:** Create groups and save the current page to the group you choose.
+- **Search your library:** Find bookmarks across all groups or within a selected group using a compact, expandable search box.
+- **Custom nicknames:** Rename saved bookmarks to make them easier to find while preserving their URLs and website icons.
+- **Move and remove bookmarks:** Transfer bookmarks between groups or delete entries you no longer need.
+- **Website icons:** Recognize saved pages by their favicons beside each bookmark.
+- **Saved-page indicator:** A check mark on the toolbar icon shows when the open page is already saved in any group.
+- **Complete backups:** Export all groups and bookmarks in one JSON file, then import it to restore the library, including nicknames.
+- **Light and dark modes:** Switch themes manually or follow your system theme until you choose a preference.
+- **Manual URL entry:** Save a URL manually when the browser prevents the extension from reading the current page.
+- **Local storage:** Groups, bookmarks, and preferences stay in your browser profile without an account.
 
 ## Install in Chrome
 
